@@ -267,6 +267,10 @@
             margin-top: 10px;
         }
 
+        .footer-link-small {
+            font-size: 8px;
+        }
+
         /* Screensaver Overlay */
         .screensaver {
             position: fixed;
@@ -391,7 +395,7 @@
                         <a href="mailto:tech@ionity.live" class="footer-link">tech@ionity.live</a>
                     </p>
                     <p>
-                        <a href="https://www.ionity.world" class="footer-link" style="font-size: 8px;">www.ionity.world</a>
+                        <a href="https://www.ionity.world" class="footer-link footer-link-small">www.ionity.world</a>
                     </p>
                 </div>
                 <div class="footer-right">
@@ -428,7 +432,11 @@
             nodeRadius: 3,
             interactionRadius: 100,
             screensaverTimeout: 60000, // 60 seconds
-            pulseStrength: 50
+            pulseStrength: 50,
+            speedDamping: 10, // Divides velocity for smoother movement
+            energyIncrement: 0.01, // Speed of energy pulsing effect
+            baseBlur: 10, // Base shadow blur amount
+            energyBlurMultiplier: 10 // Additional blur based on energy
         };
 
         // Dark Mode Toggle
@@ -485,8 +493,8 @@
             }
 
             update() {
-                this.x += this.vx / 10;
-                this.y += this.vy / 10;
+                this.x += this.vx / CONFIG.speedDamping;
+                this.y += this.vy / CONFIG.speedDamping;
 
                 // Bounce off walls
                 if (this.x < 0 || this.x > this.canvas.width) this.vx *= -1;
@@ -497,7 +505,7 @@
                 this.y = Math.max(0, Math.min(this.canvas.height, this.y));
 
                 // Update energy (pulsing effect)
-                this.energy = (this.energy + 0.01) % 1;
+                this.energy = (this.energy + CONFIG.energyIncrement) % 1;
             }
 
             draw(ctx, isDarkMode) {
@@ -510,7 +518,7 @@
                 ctx.fill();
 
                 // Glow effect
-                ctx.shadowBlur = 10 + this.energy * 10;
+                ctx.shadowBlur = CONFIG.baseBlur + this.energy * CONFIG.energyBlurMultiplier;
                 ctx.shadowColor = isDarkMode ? '#00FDFF' : '#316D6E';
             }
         }
